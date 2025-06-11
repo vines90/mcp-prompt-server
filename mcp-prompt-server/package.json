@@ -1,0 +1,37 @@
+{
+  "name": "mcp-prompt-server",
+  "version": "2.0.0",
+  "description": "MCP服务器，提供预设的prompt工具来引导Claude执行任务 - 数据库版本",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node test-db.js",
+    "inspect": "node scripts/inspect_db.js",
+    "check": "node scripts/check_db.js",
+    "verify": "node verify-server.js",
+    "test-mcp": "node test-mcp-client.js"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "prompt",
+    "ai",
+    "database",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "yaml": "^2.3.4",
+    "zod": "^3.22.4",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

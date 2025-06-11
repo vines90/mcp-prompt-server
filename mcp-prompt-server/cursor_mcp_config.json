@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "prompt-server-db": {
+      "command": "node",
+      "args": [
+        "E:/cursor/AILAB/mcp-prompt/mcp-prompt-server/src/index.js"
+      ],
+      "transport": "stdio"
+    }
+  }
+} 
