@@ -1,0 +1,19 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config)=>({command:'node',args:['src/index.js'],env:config.databaseUrl?{DATABASE_URL:config.databaseUrl}:undefined})
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required: []
+    properties:
+      databaseUrl:
+        type: string
+        default: ""
+        description: PostgreSQL connection string
+  exampleConfig:
+    databaseUrl: postgresql://user:password@localhost:5432/mydb
