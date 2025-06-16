@@ -41,8 +41,11 @@ async function getAllActivePrompts() {
         is_public,
         hotness
       FROM prompts 
-      WHERE is_public = true 
-      ORDER BY title
+      WHERE is_public = true
+      ORDER BY 
+        COALESCE(hotness, 0) DESC,
+        COALESCE(usage_count, 0) DESC,
+        title
     `;
     
     const result = await pool.query(query);
@@ -53,7 +56,7 @@ async function getAllActivePrompts() {
   }
 }
 
-// 根据用户ID获取prompts
+// 根据用户ID获取prompts (包括用户的私有提示词和公共提示词)
 async function getPromptsByUserId(userId) {
   try {
     const query = `
@@ -70,10 +73,14 @@ async function getPromptsByUserId(userId) {
         favorites_count,
         difficulty_level,
         is_public,
-        hotness
+        hotness,
+        user_id
       FROM prompts 
-      WHERE user_id = $1 AND is_public = true 
-      ORDER BY title
+      WHERE user_id = $1
+      ORDER BY 
+        COALESCE(hotness, 0) DESC,
+        COALESCE(usage_count, 0) DESC,
+        title
     `;
     
     const result = await pool.query(query, [userId]);
@@ -81,6 +88,214 @@ async function getPromptsByUserId(userId) {
   } catch (error) {
     console.error('Error fetching user prompts from database:', error);
     throw error;
+  }
+}
+
+// 新增：获取用户的所有提示词（私有 + 公共）
+async function getUserAllPrompts(userId) {
+  try {
+    const query = `
+      SELECT 
+        id,
+        title as name,
+        content,
+        tags as arguments,
+        category,
+        description,
+        created_at,
+        usage_count,
+        likes_count,
+        favorites_count,
+        difficulty_level,
+        is_public,
+        hotness,
+        user_id,
+        CASE 
+          WHEN user_id = $1 THEN 'owned'
+          ELSE 'public'
+        END as ownership
+      FROM prompts 
+      WHERE user_id = $1 OR is_public = true
+      ORDER BY 
+        CASE WHEN user_id = $1 THEN 0 ELSE 1 END,  -- 用户自己的提示词排在前面
+        COALESCE(hotness, 0) DESC,
+        COALESCE(usage_count, 0) DESC,
+        title
+    `;
+    
+    const result = await pool.query(query, [userId]);
+    return result.rows;
+  } catch (error) {
+    console.error('Error fetching user all prompts from database:', error);
+    throw error;
+  }
+}
+
+// 新增：仅获取用户私有提示词
+async function getUserPrivatePrompts(userId) {
+  try {
+    const query = `
+      SELECT 
+        id,
+        title as name,
+        content,
+        tags as arguments,
+        category,
+        description,
+        created_at,
+        usage_count,
+        likes_count,
+        favorites_count,
+        difficulty_level,
+        is_public,
+        hotness,
+        user_id
+      FROM prompts 
+      WHERE user_id = $1 AND is_public = false
+      ORDER BY 
+        COALESCE(hotness, 0) DESC,
+        COALESCE(usage_count, 0) DESC,
+        title
+    `;
+    
+    const result = await pool.query(query, [userId]);
+    return result.rows;
+  } catch (error) {
+    console.error('Error fetching user private prompts from database:', error);
+    throw error;
+  }
+}
+
+// 新增：根据用户ID和关键词搜索提示词
+async function searchUserPrompts(userId, searchTerm) {
+  try {
+    const query = `
+      SELECT 
+        id,
+        title as name,
+        content,
+        tags as arguments,
+        category,
+        description,
+        created_at,
+        usage_count,
+        likes_count,
+        favorites_count,
+        difficulty_level,
+        is_public,
+        hotness,
+        user_id,
+        CASE 
+          WHEN user_id = $1 THEN 'owned'
+          ELSE 'public'
+        END as ownership
+      FROM prompts 
+      WHERE (user_id = $1 OR is_public = true)
+        AND (
+          title ILIKE $2 
+          OR content ILIKE $2
+          OR description ILIKE $2
+          OR category ILIKE $2
+        )
+      ORDER BY 
+        CASE WHEN user_id = $1 THEN 0 ELSE 1 END,  -- 用户自己的提示词排在前面
+        COALESCE(hotness, 0) DESC,
+        COALESCE(usage_count, 0) DESC,
+        title
+      LIMIT 50
+    `;
+    
+    const result = await pool.query(query, [userId, `%${searchTerm}%`]);
+    return result.rows;
+  } catch (error) {
+    console.error('Error searching user prompts from database:', error);
+    throw error;
+  }
+}
+
+// 新增：验证用户身份的函数（支持多种验证方式）
+async function authenticateUser(userToken) {
+  try {
+    // 方式1：如果token包含冒号，则认为是 username:password 格式
+    if (userToken.includes(':')) {
+      const [username, password] = userToken.split(':');
+      return await authenticateWithPassword(username, password);
+    }
+    
+    // 方式2：如果是纯数字，则认为是用户ID（简单验证，仅用于测试）
+    const userId = parseInt(userToken);
+    if (!isNaN(userId)) {
+      const user = await getUserById(userId);
+      if (user && user.is_active) {
+        return user;
+      }
+    }
+    
+    // 方式3：如果是JWT格式，则进行JWT验证（可扩展）
+    if (userToken.includes('.') && userToken.split('.').length === 3) {
+      // TODO: 实现JWT验证
+      console.log('JWT验证暂未实现');
+      return null;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error authenticating user:', error);
+    return null;
+  }
+}
+
+// 新增：用户名密码验证函数
+async function authenticateWithPassword(username, password) {
+  try {
+    // 导入bcrypt用于密码验证
+    const bcrypt = await import('bcrypt');
+    
+    const query = `
+      SELECT 
+        id,
+        username,
+        password,
+        avatar_url,
+        bio,
+        followers_count,
+        following_count,
+        public_prompts_count,
+        created_at,
+        display_name,
+        location,
+        website,
+        twitter_url,
+        updated_at
+      FROM users 
+      WHERE username = $1
+    `;
+    
+    const result = await pool.query(query, [username]);
+    const user = result.rows[0];
+    
+    if (!user) {
+      console.log(`❌ 用户 ${username} 不存在`);
+      return null;
+    }
+    
+    // 验证密码
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+    if (!isPasswordValid) {
+      console.log(`❌ 用户 ${username} 密码错误`);
+      return null;
+    }
+    
+    console.log(`✅ 用户 ${username} 密码验证成功`);
+    
+    // 返回用户信息（不包含密码）
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+    
+  } catch (error) {
+    console.error('Error authenticating with password:', error);
+    return null;
   }
 }
 
@@ -137,14 +352,18 @@ async function getUserById(userId) {
     const query = `
       SELECT 
         id,
-        sub,
-        email,
-        plan,
-        tokens_used,
-        requests_today,
-        total_requests,
+        username,
+        avatar_url,
+        bio,
+        followers_count,
+        following_count,
+        public_prompts_count,
         created_at,
-        is_active
+        display_name,
+        location,
+        website,
+        twitter_url,
+        updated_at
       FROM users 
       WHERE id = $1
     `;
@@ -319,5 +538,10 @@ export {
   getHotPrompts,
   getPromptsByDifficulty,
   getStats,
-  closePool
+  closePool,
+  getUserAllPrompts,
+  getUserPrivatePrompts,
+  searchUserPrompts,
+  authenticateUser,
+  authenticateWithPassword
 }; 
