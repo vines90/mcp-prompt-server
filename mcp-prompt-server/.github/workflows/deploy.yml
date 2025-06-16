@@ -14,7 +14,7 @@ jobs:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: test_password
           POSTGRES_DB: promptdb_test
         options: >-
           --health-cmd pg_isready
@@ -38,7 +38,7 @@ jobs:
     
     - name: Run tests
       env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/promptdb_test' }}
+        DATABASE_URL: postgresql://postgres:test_password@localhost:5432/promptdb_test
         NODE_ENV: test
       run: |
         echo "Testing database connection..."
