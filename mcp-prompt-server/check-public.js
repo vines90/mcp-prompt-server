@@ -2,7 +2,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:9lxnx6j9@dbconn.sealosgzg.site:31740/?directConnection=true'
+  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/promptdb'
 });
 
 async function checkPublicStatus() {
