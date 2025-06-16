@@ -1,0 +1,91 @@
+name: Deploy MCP Prompt Server
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: promptdb_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/promptdb_test' }}
+        NODE_ENV: test
+      run: |
+        echo "Testing database connection..."
+        node -e "
+          import('./src/database.js').then(db => {
+            db.testConnection().then(success => {
+              if (success) {
+                console.log('✅ Database connection test passed');
+                process.exit(0);
+              } else {
+                console.log('❌ Database connection test failed');
+                process.exit(1);
+              }
+            });
+          });
+        "
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build project
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NODE_ENV: production
+        MAX_PROMPT_TOOLS: ${{ vars.MAX_PROMPT_TOOLS || '50' }}
+      run: |
+        echo "Building with environment:"
+        echo "NODE_ENV: $NODE_ENV"
+        echo "MAX_PROMPT_TOOLS: $MAX_PROMPT_TOOLS"
+        echo "DATABASE_URL: [HIDDEN]"
+        
+    # 这里可以添加部署步骤，例如：
+    # - name: Deploy to server
+    #   run: |
+    #     echo "Deploying to production server..."
+    #     # 添加您的部署命令 

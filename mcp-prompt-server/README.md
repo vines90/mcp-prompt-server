@@ -29,7 +29,27 @@ mcp-prompt-server/
 npm install
 ```
 
-### 2. 配置Cursor MCP
+> 📦 项目已包含 `dotenv` 依赖，支持 `.env` 文件配置
+
+### 2. 配置数据库
+设置数据库连接环境变量：
+
+```bash
+# Linux/Mac
+export DATABASE_URL="postgresql://username:password@host:port/database_name"
+
+# Windows (PowerShell)
+$env:DATABASE_URL="postgresql://username:password@host:port/database_name"
+```
+
+**或者创建 `.env` 文件**（推荐）：
+```env
+DATABASE_URL=postgresql://username:password@host:port/database_name
+```
+
+> 📋 详细配置说明请查看 [CONFIG.md](./CONFIG.md)
+
+### 3. 配置Cursor MCP
 在Cursor的MCP配置中添加：
 
 ```json
@@ -44,13 +64,13 @@ npm install
 }
 ```
 
-### 3. 身份验证
+### 4. 身份验证
 使用 `authenticate_user` 工具：
 ```
 用户令牌: username:password
 ```
 
-### 4. 开始使用
+### 5. 开始使用
 - 🔍 `search_user_prompts` - 搜索提示词
 - 🚀 `use_user_prompt` - 调用提示词
 - 📋 `get_user_prompt_info` - 查看详情
@@ -80,6 +100,8 @@ npm install
 ## 🔗 相关链接
 
 - **详细文档**: [README-USER-VERSION.md](./README-USER-VERSION.md)
+- **配置说明**: [CONFIG.md](./CONFIG.md)
+- **GitHub配置**: [GITHUB-SETUP.md](./GITHUB-SETUP.md)
 - **AI咖官网**: [www.aiprompter.cc](https://www.aiprompter.cc)
 - **MCP协议**: [Model Context Protocol](https://modelcontextprotocol.io/)
 - **Cursor编辑器**: [cursor.sh](https://cursor.sh/)

@@ -1,9 +1,14 @@
 import pkg from 'pg';
+import dotenv from 'dotenv';
+
+// 加载环境变量
+dotenv.config();
+
 const { Pool } = pkg;
 
 // 数据库连接配置
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:9lxnx6j9@dbconn.sealosgzg.site:31740/?directConnection=true',
+  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/promptdb',
   max: 20,        // 最大连接数
   idleTimeoutMillis: 30000,  // 空闲连接超时时间
   connectionTimeoutMillis: 2000, // 连接超时时间

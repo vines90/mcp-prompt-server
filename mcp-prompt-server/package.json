@@ -1,13 +1,15 @@
 {
   "name": "mcp-prompt-server",
-  "version": "2.0.0",
-  "description": "MCP服务器，提供预设的prompt工具来引导Claude执行任务 - 数据库版本",
+  "version": "3.0.0",
+  "description": "基于AI咖平台的MCP服务器，支持个人提示词库访问和身份验证",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
+    "start:public": "node src/index-public.js",
     "dev": "nodemon src/index.js",
-    "test": "node test-db.js",
+    "dev:public": "nodemon src/index-public.js",
+    "test": "node --env-file=.env src/index.js",
     "inspect": "node scripts/inspect_db.js",
     "check": "node scripts/check_db.js",
     "verify": "node verify-server.js",
@@ -19,13 +21,16 @@
     "prompt",
     "ai",
     "database",
-    "postgresql"
+    "postgresql",
+    "ai-prompter",
+    "authentication"
   ],
-  "author": "",
+  "author": "AI咖团队",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.7.0",
     "bcrypt": "^6.0.0",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "fs-extra": "^11.2.0",
     "pg": "^8.11.3",
@@ -34,5 +39,13 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/mcp-prompt-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/mcp-prompt-server/issues"
+  },
+  "homepage": "https://www.aiprompter.cc"
 }
