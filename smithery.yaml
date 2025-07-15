@@ -1,0 +1,37 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'node', args: ['src/index.js'], env: { PROMPT_MANAGER_API_URL: config.promptManagerApiUrl, SECRET_KEY: config.secretKey || '', USER_TOKEN: config.userToken || '', USERNAME: config.username || '', PASSWORD: config.password || '', NODE_ENV: config.nodeEnv || 'production' } })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required: []
+    properties:
+      promptManagerApiUrl:
+        type: string
+        default: https://www.aiprompter.cc
+        description: API service base URL
+      secretKey:
+        type: string
+        description: Optional secret key for authentication
+      userToken:
+        type: string
+        description: Optional JWT token for authentication
+      username:
+        type: string
+        description: Optional username for authentication
+      password:
+        type: string
+        description: Optional password for authentication
+      nodeEnv:
+        type: string
+        default: production
+        description: Node environment mode
+  exampleConfig:
+    promptManagerApiUrl: https://www.aiprompter.cc
+    secretKey: your_64_character_secret_key_here
+    nodeEnv: production
