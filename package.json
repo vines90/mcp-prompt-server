@@ -1,26 +1,46 @@
 {
-  "name": "mcp-prompt-server",
-  "version": "3.0.0",
-  "description": "MCP服务器，通过API提供预设的prompt工具来引导Claude执行任务",
+  "name": "aiprompter-mcp-server",
+  "version": "4.0.0",
+  "description": "AI提示词管理MCP服务器 - 支持Secret-Key认证、提示词管理、公共广场访问",
   "main": "src/index.js",
   "type": "module",
+  "bin": {
+    "aiprompter-mcp-server": "src/index.js"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "node simple-test.js",
     "verify": "node verify-server.js",
-    "test-mcp": "node test-mcp-client.js"
+    "test-mcp": "node test-mcp-client.js",
+    "test-production": "node test-production.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "mcp",
-    "claude",
-    "prompt",
+    "model-context-protocol",
     "ai",
-    "api",
-    "secret-key"
+    "prompt",
+    "management",
+    "claude",
+    "cursor",
+    "windsurf",
+    "secret-key",
+    "api"
   ],
-  "author": "",
+  "author": "AI Prompter Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vines90/mcp-prompt-server.git"
+  },
+  "homepage": "https://www.aiprompter.cc",
+  "bugs": {
+    "url": "https://github.com/vines90/mcp-prompt-server/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.15.0",
     "axios": "^1.10.0",

@@ -1,240 +1,203 @@
-# MCP Prompt Server
+# AI Prompter MCP Server
 
-基于API的Model Context Protocol (MCP) 提示词服务器 v4.0.0
-
-## 🎯 概述
-
-MCP Prompt Server 是一个高性能的 MCP 服务器，通过 API 方式获取和管理提示词，为 Cursor、Windsurf 等 AI 编程工具提供丰富的提示词库。
-
-## ✨ 核心特性
-
-- 🔗 **API驱动**: 通过HTTP API获取1000+个提示词，无需本地数据库
-- 🔐 **多重认证**: 支持Secret Key、JWT Token、用户名密码等多种认证方式
-- 👤 **私有提示词**: 认证用户可访问个人专属提示词库
-- 🚀 **智能限制**: 自动限制工具数量以优化性能
-- 🔥 **热度排序**: 优先加载热门和高质量提示词
-- 📂 **分类管理**: 按类别组织提示词，便于查找和使用
-- 🔄 **容错机制**: API失败时自动降级到本地文件系统
-- 🛠️ **丰富工具**: 提供搜索、分类、统计等管理工具
+一个功能完备的AI提示词管理MCP服务器，支持Secret-Key认证、提示词管理、公共广场访问等功能。
 
 ## 🚀 快速开始
 
-### 1. 安装依赖
+### 安装
+
 ```bash
-npm install
+npm install -g aiprompter-mcp-server
 ```
 
-### 2. 配置认证（可选）
-创建 `.env` 文件：
-```bash
-# API服务地址
-PROMPT_MANAGER_API_URL=https://www.aiprompter.cc
+### 基本配置
 
-# 方式1: Secret Key认证（推荐）
-SECRET_KEY=your_64_character_secret_key_here
+创建配置文件 `~/.aiprompter-mcp-config.json`：
 
-# 方式2: 用户名密码认证
-# USERNAME=your_username
-# PASSWORD=your_password
-
-# 方式3: JWT Token认证
-# USER_TOKEN=your_jwt_token_here
-
-# 环境模式（可选，默认development）
-NODE_ENV=development
-```
-
-### 3. 启动服务器
-```bash
-npm start
-```
-
-### 4. 集成到Cursor
-编辑 `~/.cursor/mcp_config.json`：
 ```json
 {
-  "mcpServers": {
-    "prompt-server": {
-      "command": "node",
-      "args": [
-        "/path/to/your/mcp-prompt-server/src/index.js"
-      ],
-      "transport": "stdio",
-      "env": {
-        "PROMPT_MANAGER_API_URL": "https://www.aiprompter.cc",
-        "SECRET_KEY": "your_secret_key_here",
-        "NODE_ENV": "production"
+  "api_url": "https://www.aiprompter.cc",
+  "secret_key": "your-secret-key-here"
+}
+```
+
+### Cursor配置示例
+
+在 `~/.cursor/mcp.json` 中添加：
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "aiprompter": {
+        "command": "npx",
+        "args": ["aiprompter-mcp-server"],
+        "env": {
+          "PROMPT_MANAGER_API_URL": "https://www.aiprompter.cc",
+          "SECRET_KEY": "your-secret-key"
+        }
       }
     }
   }
 }
 ```
 
-## 🔐 认证配置
+### Claude Desktop配置示例
 
-### Secret Key认证（推荐）
-1. 登录 [AI咖网站](https://www.aiprompter.cc)
-2. 进入用户菜单 -> Secret Key
-3. 复制64位密钥到配置文件
+在 `claude_desktop_config.json` 中添加：
 
-**优势：**
-- 🔒 高安全性，无需暴露密码
-- 🔄 支持随时刷新和撤销
-- 📝 可访问私有提示词
-
-### 匿名模式
-不配置认证信息时自动使用匿名模式，仅可访问公共提示词。
-
-## ⚙️ 配置选项
-
-### 服务器配置
-```bash
-# API服务地址
-PROMPT_MANAGER_API_URL=https://www.aiprompter.cc
-
-# Secret Key认证（推荐）
-SECRET_KEY=your_64_character_secret_key_here
-
-# 环境模式
-NODE_ENV=development  # 开发模式，详细日志
-NODE_ENV=production   # 生产模式，简化日志
+```json
+{
+  "mcpServers": {
+    "aiprompter": {
+      "command": "npx",
+      "args": ["aiprompter-mcp-server"],
+      "env": {
+        "PROMPT_MANAGER_API_URL": "https://www.aiprompter.cc",
+          "SECRET_KEY": "your-secret-key"
+      }
+    }
+  }
+}
 ```
 
-**性能特点：**
-- 🎯 **固定工具数量**: 恒定8个管理工具，无性能瓶颈
-- ⚡ **高效架构**: 不再动态生成工具，启动快速
-- 🔄 **按需获取**: 通过管理工具按需查找和获取提示词
+## 🛠️ 功能特性
 
-### 工具名称规范
-自动清理工具名称，确保MCP兼容性：
-- 特殊字符转换为下划线
-- 中文词汇自动转换为英文
-- 重复名称自动去重
+### 认证方式
+- **Secret-Key认证**：64位密钥，无需用户名密码
+- **JWT Token认证**：传统用户名密码方式
 
-## 🛠️ 可用工具
+### 提示词管理
+- **创建提示词**：支持分类、标签、公开/私有设置
+- **搜索提示词**：关键词、分类、标签搜索
+- **更新提示词**：完整CRUD操作，带版本记录
+- **删除提示词**：级联删除相关数据
 
-### 管理工具（12个）
-提供完整的提示词管理工具集：
+### 提示词库访问
+- **公共提示词广场**：查看社区共享的提示词
+- **私有提示词库**：个人专属提示词管理
+- **热门提示词**：按热度排序的精选提示词
 
-**认证工具**：
-1. `auth_status` - 检查当前认证状态
+### 高级功能
+- **Redis缓存**：提升查询性能
+- **版本控制**：每次更新自动生成版本记录
+- **响应式设计**：适配桌面和移动端
+- **错误重试**：网络异常自动重试
 
-**查询工具**：
-2. `get_prompts` - 获取提示词列表（支持公共/私有库）
-3. `search_prompts` - 搜索提示词（按关键词查找）
-4. `get_all_categories` - 获取所有分类
-5. `get_prompts_by_category` - 按分类获取提示词
-6. `get_prompt_names` - 获取所有提示词名称
-7. `get_prompt_detail` - 获取提示词详细信息
-8. `get_api_stats` - 获取API服务统计信息
+## 📋 可用工具
 
-**操作工具**：
-9. `add_prompt` - 添加新提示词到个人库
-10. `update_prompt` - 更新已有提示词
+### 认证相关
+- `auth_status` - 检查当前认证状态
+- `get_user_profile` - 获取用户信息
 
-**用户工具**：
-11. `user_login` - 用户登录认证
+### 提示词操作
+- `get_prompts` - 获取提示词列表（支持搜索、分页）
+- `get_prompt_detail` - 获取单个提示词详情
+- `get_public_prompts` - 获取公共提示词
+- `get_trending_prompts` - 获取热门提示词
+- `add_prompt` - 添加新提示词
+- `update_prompt` - 更新提示词
+- `delete_prompt` - 删除提示词
 
-## 🔧 测试和验证
+## 🔧 环境变量
 
-### 测试API连接
+| 变量名 | 描述 | 默认值 |
+|--------|------|--------|
+| `PROMPT_MANAGER_API_URL` | API服务器地址 | `https://www.aiprompter.cc` |
+| `SECRET_KEY` | 64位Secret-Key认证 | 必填 |
+| `USER_TOKEN` | JWT Token认证（可选） | - |
+| `USERNAME` | 用户名（JWT认证用） | - |
+| `PASSWORD` | 密码（JWT认证用） | - |
+
+## 📦 安装方式
+
+### NPM安装（推荐）
 ```bash
+npm install -g aiprompter-mcp-server
+```
+
+### 源码安装
+```bash
+git clone https://github.com/vines90/mcp-prompt-server.git
+cd mcp-prompt-server
+npm install
+npm run build
+```
+
+## 🧪 测试
+
+```bash
+# 运行基础测试
 npm test
+
+# 运行生产环境测试
+npm run test:production
+
+# 验证配置
+npm run verify-config
 ```
 
-### 验证服务器配置
+## 🔍 调试
+
+### 日志级别
+设置环境变量 `LOG_LEVEL`：
+- `debug`：详细日志
+- `info`：基本信息
+- `warn`：警告信息
+- `error`：错误信息
+
+### 示例调试命令
 ```bash
-npm run verify
+LOG_LEVEL=debug npx aiprompter-mcp-server
 ```
 
-### 测试MCP协议
-```bash
-npm run test-mcp
+## 📄 服务配置示例
+
+### 最小配置
+```json
+{
+  "command": "npx",
+  "args": ["aiprompter-mcp-server"],
+  "env": {
+    "SECRET_KEY": "your-64-char-secret-key"
+  }
+}
 ```
 
-## 📊 性能优化
-
-### 智能特性
-- 🎯 **热度排序**: 优先加载热门提示词
-- 🔄 **智能缓存**: 减少API请求次数
-- ⚡ **并发控制**: 优化网络请求性能
-- 🛡️ **错误恢复**: 自动重试和降级机制
-
-### 网络优化
-- 📍 使用就近的API服务器
-- ⏱️ 配置合适的超时时间
-- 🔄 智能重试策略
-
-## 🔥 高级功能
-
-### 私有提示词支持
-- 👤 个人专属提示词库
-- 🔐 基于用户权限的访问控制
-- 🔄 与网站数据实时同步
-
-### 智能搜索
-- 🔍 按名称、内容、描述搜索
-- 📂 分类筛选
-- 🎯 基于用户偏好推荐
-
-### 使用统计
-- 📈 自动记录使用次数
-- 🏆 热门提示词排行
-- 📊 个人使用报告
-
-## 🐛 故障排除
-
-### 常见问题
-
-**API连接失败**
-```bash
-# 检查网络连接
-curl https://www.aiprompter.cc/api/health
-
-# 验证API地址配置
-echo $PROMPT_MANAGER_API_URL
+### 完整配置
+```json
+{
+  "command": "npx",
+  "args": ["aiprompter-mcp-server"],
+  "env": {
+    "PROMPT_MANAGER_API_URL": "https://www.aiprompter.cc",
+    "SECRET_KEY": "your-secret-key",
+    "LOG_LEVEL": "info",
+    "MAX_PROMPT_TOOLS": "10"
+  }
+}
 ```
 
-**认证失败**
-```bash
-# 验证Secret Key
-curl -X PUT "https://www.aiprompter.cc/api/user/secret-key" \
-  -H "X-Secret-Key: YOUR_SECRET_KEY"
-```
+## 🎯 使用场景
 
-**工具加载失败**
-- 检查工具数量限制配置
-- 验证网络连接稳定性
-- 查看控制台错误日志
+### 个人用户
+- 管理个人AI提示词库
+- 发现和使用社区优质提示词
+- 跨设备同步提示词
 
-## 📈 版本历史
+### 团队用户
+- 共享团队提示词资源
+- 维护提示词版本历史
+- 权限管理和协作
 
-### v4.0.0 (Enhanced Edition)
-- 🔐 增强Secret Key认证系统
-- 🔍 新增高级搜索和筛选功能
-- 📋 支持公共/私有提示词库分离
-- 🛠️ 完整的CRUD操作支持
-- 📊 详细的认证状态和统计信息
-
-### v3.0.0 (API Edition)
-- 🔄 完全迁移到API架构
-- 🔐 新增Secret Key认证系统
-- 👤 支持用户私有提示词
-- ⚡ 优化性能和错误处理
-- 🗑️ 移除数据库依赖
-
-### v2.0.0 (Database Edition)
-- 📊 PostgreSQL数据库支持
-- 🎯 热度排序算法
-- 🛠️ 丰富的管理工具
-
-### v1.0.0 (File Edition)  
-- 📁 基础文件系统版本
-- 📄 YAML/JSON格式支持
+### 开发者
+- 构建AI应用的基础提示词管理
+- 快速集成提示词功能
+- 提供标准化API接口
 
 ## 🤝 贡献指南
 
-欢迎提交Issue和Pull Request来改进这个项目！
+欢迎提交Issue和Pull Request！
 
 ### 开发流程
 1. Fork 项目
@@ -248,6 +211,6 @@ curl -X PUT "https://www.aiprompter.cc/api/user/secret-key" \
 - 💬 **微信群**: 扫描网站二维码加入
 - 🐛 **问题反馈**: 通过GitHub Issues
 
-## �� 许可证
+## 📄 许可证
 
 MIT License
