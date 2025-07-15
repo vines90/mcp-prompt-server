@@ -1,5 +1,7 @@
 # MCP Prompt Server
 
+[![smithery badge](https://smithery.ai/badge/@vines90/mcp-prompt-server)](https://smithery.ai/server/@vines90/mcp-prompt-server)
+
 基于API的Model Context Protocol (MCP) 提示词服务器 v4.0.0
 
 ## 🎯 概述
@@ -18,6 +20,15 @@ MCP Prompt Server 是一个高性能的 MCP 服务器，通过 API 方式获取�
 - 🛠️ **丰富工具**: 提供搜索、分类、统计等管理工具
 
 ## 🚀 快速开始
+
+### 安装
+### Installing via Smithery
+
+To install mcp-prompt-server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@vines90/mcp-prompt-server):
+
+```bash
+npx -y @smithery/cli install @vines90/mcp-prompt-server --client claude
+```
 
 ### 1. 安装依赖
 ```bash
@@ -248,6 +259,6 @@ curl -X PUT "https://www.aiprompter.cc/api/user/secret-key" \
 - 💬 **微信群**: 扫描网站二维码加入
 - 🐛 **问题反馈**: 通过GitHub Issues
 
-## �� 许可证
+## 📜 许可证
 
 MIT License
