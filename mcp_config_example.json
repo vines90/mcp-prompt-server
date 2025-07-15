@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "prompt-server": {
+      "command": "node",
+      "args": [
+        "/path/to/your/mcp-prompt-server/src/index.js"
+      ],
+      "transport": "stdio",
+      "env": {
+        "PROMPT_MANAGER_API_URL": "https://www.aiprompter.cc",
+        "SECRET_KEY": "your_64_character_secret_key_here",
+        "MAX_PROMPT_TOOLS": "25",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

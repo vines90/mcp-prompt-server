@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "prompt-server": {
+      "command": "node",
+      "args": [
+        "/Users/xuliyang/Documents/工作/AI/prompt2/prompt-manager/mcp-prompt-server/src/index.js"
+      ],
+      "env": {
+        "PROMPT_MANAGER_API_URL": "http://localhost:3001",
+        "NODE_ENV": "development",
+        "MAX_PROMPT_TOOLS": "25",
+        "USERNAME": "admin",
+        "PASSWORD": "password123",
+        "JWT_SECRET": "your-secret-key-here"
+      }
+    }
+  }
+}

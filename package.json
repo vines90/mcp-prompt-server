@@ -1,0 +1,35 @@
+{
+  "name": "mcp-prompt-server",
+  "version": "3.0.0",
+  "description": "MCP服务器，通过API提供预设的prompt工具来引导Claude执行任务",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node simple-test.js",
+    "verify": "node verify-server.js",
+    "test-mcp": "node test-mcp-client.js"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "prompt",
+    "ai",
+    "api",
+    "secret-key"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "axios": "^1.10.0",
+    "dotenv": "^17.0.1",
+    "fs-extra": "^11.2.0",
+    "yaml": "^2.3.4",
+    "zod": "^3.25.75"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
